@@ -19,6 +19,7 @@ func NewSosmedHandler(r *gin.Engine, sosmedUc domain.SosmedUseCase, db *gorm.DB)
 	}
 	router := r.Group("/socialmedias")
 	{
+		router.Use(middlewares.Authentication())
 		router.POST("/", handler.CreateSosmed)
 		router.GET("/", handler.GetSosmeds)
 		router.PUT("/:socialMediaId", middlewares.SosmedAuthorization(db), handler.UpdateSosmed)
