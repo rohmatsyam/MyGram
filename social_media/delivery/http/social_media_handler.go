@@ -2,24 +2,28 @@ package http
 
 import (
 	"final_zoom/domain"
+	"final_zoom/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type SosmedHandler struct {
 	sosmedUseCase domain.SosmedUseCase
 }
 
-func NewSosmedHandler(r *gin.Engine, sosmedUc domain.SosmedUseCase) {
+func NewSosmedHandler(r *gin.Engine, sosmedUc domain.SosmedUseCase, db *gorm.DB) {
 	handler := &SosmedHandler{
 		sosmedUseCase: sosmedUc,
 	}
 	router := r.Group("/socialmedias")
-	router.POST("/", handler.CreateSosmed)
-	router.GET("/", handler.GetSosmeds)
-	router.PUT("/:socialMediaId", handler.UpdateSosmed)
-	router.DELETE("/:socialMediaId", handler.DeleteSosmed)
+	{
+		router.POST("/", handler.CreateSosmed)
+		router.GET("/", handler.GetSosmeds)
+		router.PUT("/:socialMediaId", middlewares.SosmedAuthorization(db), handler.UpdateSosmed)
+		router.DELETE("/:socialMediaId", middlewares.SosmedAuthorization(db), handler.DeleteSosmed)
+	}
 }
 
 func (h SosmedHandler) CreateSosmed(c *gin.Context) {
@@ -59,8 +63,25 @@ func (h SosmedHandler) GetSosmeds(c *gin.Context) {
 		return
 	}
 
+	hasil := make([]map[string]interface{}, len(res))
+	for i := 0; i < len(res); i++ {
+		hasil[i] = map[string]interface{}{
+			"id":         res[i]["id_sosmed"],
+			"title":      res[i]["name"],
+			"caption":    res[i]["social_media_url"],
+			"user_id":    res[i]["user_id"],
+			"created_at": res[i]["created_at"],
+			"updated_at": res[i]["updated_at"],
+			"User": map[string]interface{}{
+				"id":       res[i]["id_user"],
+				"email":    res[i]["email"],
+				"username": res[i]["username"],
+			},
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"result": res,
+		"result": hasil,
 		"count":  len(res),
 	})
 }

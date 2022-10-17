@@ -14,6 +14,10 @@ import (
 	photorepository "final_zoom/photo/repository/postgre"
 	photousecase "final_zoom/photo/usecase"
 
+	commenthandler "final_zoom/comment/delivery/http"
+	commentrepository "final_zoom/comment/repository/postgre"
+	commentusecase "final_zoom/comment/usecase"
+
 	sosmedhandler "final_zoom/social_media/delivery/http"
 	sosmedrepository "final_zoom/social_media/repository/postgre"
 	sosmedusecase "final_zoom/social_media/usecase"
@@ -54,15 +58,19 @@ func main() {
 
 	userRepo := userrepository.NewUserRepository(db)
 	userUseCase := userusecase.NewUserUseCase(userRepo)
-	userhandler.NewUserHandler(router, userUseCase)
+	userhandler.NewUserHandler(router, userUseCase, db)
 
 	photoRepo := photorepository.NewPhotoRepository(db)
 	photoUseCase := photousecase.NewPhotoUseCase(photoRepo)
-	photohandler.NewPhotoHandler(router, photoUseCase)
+	photohandler.NewPhotoHandler(router, photoUseCase, db)
+
+	commentRepo := commentrepository.NewCommentRepository(db)
+	commentUseCase := commentusecase.NewCommentUseCase(commentRepo)
+	commenthandler.NewCommentHandler(router, commentUseCase, db)
 
 	sosmedRepo := sosmedrepository.NewSosmedRepository(db)
 	sosmedUseCase := sosmedusecase.NewSosmedUseCase(sosmedRepo)
-	sosmedhandler.NewSosmedHandler(router, sosmedUseCase)
+	sosmedhandler.NewSosmedHandler(router, sosmedUseCase, db)
 
 	router.Run(fmt.Sprintf("localhost:%s", APP_PORT))
 	log.Println("Berjalan pada port :", APP_PORT)

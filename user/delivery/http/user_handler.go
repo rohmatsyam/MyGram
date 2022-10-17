@@ -6,13 +6,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type UserHandler struct {
 	userUseCase domain.UserUseCase
 }
 
-func NewUserHandler(r *gin.Engine, userUc domain.UserUseCase) {
+func NewUserHandler(r *gin.Engine, userUc domain.UserUseCase, db *gorm.DB) {
 	handler := &UserHandler{
 		userUseCase: userUc,
 	}
@@ -23,8 +24,8 @@ func NewUserHandler(r *gin.Engine, userUc domain.UserUseCase) {
 		router.Use(middlewares.Authentication())
 		router.GET("/:userId", handler.GetUserById)
 		router.GET("/", handler.GetUsers)
-		router.PUT("/:userId", handler.UpdateUser)
-		router.DELETE("/:userId", handler.DeleteUser)
+		router.PUT("/:userId", middlewares.UserAuthorization(db), handler.UpdateUser)
+		router.DELETE("/:userId", middlewares.UserAuthorization(db), handler.DeleteUser)
 	}
 }
 func (h UserHandler) GetUserById(c *gin.Context) {

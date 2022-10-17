@@ -112,7 +112,7 @@ func (m *userRepository) DeleteUserRepository(c *gin.Context) (user *domain.User
 		return nil, errors.New("data not found")
 	}
 
-	err = m.DB.Delete(&user).Error
+	err = m.DB.Unscoped().Delete(&user).Error
 	if err != nil {
 		return nil, errors.New("delete failed")
 	}

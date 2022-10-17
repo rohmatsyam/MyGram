@@ -4,8 +4,10 @@ import (
 	"errors"
 	"final_zoom/domain"
 	"final_zoom/helpers"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/gorm"
 )
 
@@ -22,6 +24,8 @@ func NewCommentRepository(db *gorm.DB) domain.CommentRepository {
 var appJSON = "application/json"
 
 func (m *commentRepository) CreateCommentRepository(c *gin.Context) (comment *domain.Comment, err error) {
+	userData := c.MustGet("userData").(jwt.MapClaims)
+	userID := uint(userData["id"].(float64))
 	contentType := helpers.GetContentType(c)
 
 	if contentType == appJSON {
@@ -30,6 +34,7 @@ func (m *commentRepository) CreateCommentRepository(c *gin.Context) (comment *do
 		c.ShouldBind(&comment)
 	}
 
+	comment.UserID = userID
 	err = m.DB.Debug().Create(&comment).Error
 
 	if err != nil {
@@ -37,13 +42,24 @@ func (m *commentRepository) CreateCommentRepository(c *gin.Context) (comment *do
 	}
 	return comment, nil
 }
-func (m *commentRepository) GetCommentsRepository(c *gin.Context) (comments []*domain.Comment, err error) {
-	err = m.DB.Debug().Model(&comments).Find(&comments).Error
+func (m *commentRepository) GetCommentsRepository(c *gin.Context) (results []map[string]interface{}, err error) {
+	userData := c.MustGet("userData").(jwt.MapClaims)
+	userID := uint(userData["id"].(float64))
+	query := fmt.Sprintf(`
+	SELECT c.id AS id_comment,c.message,c.user_id AS c_user_id,c.photo_id AS c_photo_id,c.created_at,c.updated_at,
+	u.id AS id_user,u.username,u.email,
+	p.id AS id_photo,p.title,p.caption,p.photo_url,p.user_id AS p_user_id
+	FROM comments c
+	LEFT JOIN users u on c.user_id = u.id
+	LEFT Join photos p on p.user_id = u.id WHERE u.id = %d`, userID)
+
+	err = m.DB.Debug().Raw(query).Scan(&results).Error
 
 	if err != nil {
 		return nil, err
 	}
-	return comments, nil
+
+	return results, nil
 }
 func (m *commentRepository) UpdateCommentRepository(c *gin.Context) (comment *domain.Comment, err error) {
 	var newComment domain.Comment
@@ -76,7 +92,7 @@ func (m *commentRepository) DeleteCommentRepository(c *gin.Context) (comment *do
 		return nil, errors.New("data not found")
 	}
 
-	err = m.DB.Delete(&comment).Error
+	err = m.DB.Unscoped().Delete(&comment).Error
 	if err != nil {
 		return nil, errors.New("delete failed")
 	}

@@ -10,13 +10,13 @@ import (
 
 type User struct {
 	gorm.Model
-	Username    string      `json:"username" gorm:"NOT NULL;unique;type:varchar(255);" valid:"required"`
-	Email       string      `json:"email" gorm:"NOT NULL;unique;type:varchar(255);" valid:"required,email"`
-	Password    string      `json:"password" gorm:"NOT NULL;type:text;" valid:"required,minstringlength(6)"`
-	Age         uint        `json:"age" gorm:"NOT NULL;type:integer;" valid:"required,range(8|100)"`
-	SocialMedia SocialMedia `json:"social_media,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Photo       []Photo     `json:"photo,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Comment     []Comment   `json:"comment,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Username    string        `json:"username" gorm:"NOT NULL;unique;type:varchar(255);" valid:"required"`
+	Email       string        `json:"email" gorm:"NOT NULL;unique;type:varchar(255);" valid:"required,email"`
+	Password    string        `json:"password" gorm:"NOT NULL;type:text;" valid:"required,minstringlength(6)"`
+	Age         uint          `json:"age" gorm:"NOT NULL;type:integer;" valid:"required,range(8|100)"`
+	SocialMedia []SocialMedia `json:"social_media,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Photo       []Photo       `json:"photos,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Comment     []Comment     `json:"comments,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

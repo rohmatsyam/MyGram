@@ -4,9 +4,10 @@ import (
 	"errors"
 	"final_zoom/domain"
 	"final_zoom/helpers"
-	"log"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/gorm"
 )
 
@@ -23,13 +24,17 @@ func NewPhotoRepository(db *gorm.DB) domain.PhotoRepository {
 var appJSON = "application/json"
 
 func (m *photoRepository) CreatePhotoRepository(c *gin.Context) (photo *domain.Photo, err error) {
-	contentType := helpers.GetContentType(c)
+	userData := c.MustGet("userData").(jwt.MapClaims)
+	userID := uint(userData["id"].(float64))
 
+	contentType := helpers.GetContentType(c)
 	if contentType == appJSON {
 		c.ShouldBindJSON(&photo)
 	} else {
 		c.ShouldBind(&photo)
 	}
+
+	photo.UserID = userID
 
 	err = m.DB.Debug().Create(&photo).Error
 
@@ -39,18 +44,22 @@ func (m *photoRepository) CreatePhotoRepository(c *gin.Context) (photo *domain.P
 	return photo, nil
 }
 
-func (m *photoRepository) GetPhotosRepository(c *gin.Context) (photos []*domain.Photo, err error) {
-	// err = m.DB.Debug().Model(&photos).Find(&photos).Error
-	// err = m.DB.Debug().Model(&domain.User{}).Preload("Photos").Find(&domain.User{}).Error
+func (m *photoRepository) GetPhotosRepository(c *gin.Context) (results []map[string]interface{}, err error) {
+	userData := c.MustGet("userData").(jwt.MapClaims)
+	userID := uint(userData["id"].(float64))
 
-	var user domain.User
-	err = m.DB.Debug().Preload("Photo").Find(&user).Error
+	query := fmt.Sprintf(`
+	SELECT p.id AS id_photo,p.title,p.caption,p.photo_url,p.user_id,p.created_at,p.updated_at,
+	u.email,u.username
+	FROM photos p
+	lEft JOIN users u ON p.user_id = u.id WHERE u.id=%d`, userID)
+	err = m.DB.Debug().Raw(query).Scan(&results).Error
 
 	if err != nil {
 		return nil, err
 	}
-	log.Println("berhasil")
-	return photos, nil
+
+	return results, nil
 }
 
 func (m *photoRepository) UpdatePhotoRepository(c *gin.Context) (photo *domain.Photo, err error) {
@@ -87,7 +96,7 @@ func (m *photoRepository) DeletePhotoRepository(c *gin.Context) (photo *domain.P
 		return nil, errors.New("data not found")
 	}
 
-	err = m.DB.Delete(&photo).Error
+	err = m.DB.Unscoped().Delete(&photo).Error
 	if err != nil {
 		return nil, errors.New("delete failed")
 	}

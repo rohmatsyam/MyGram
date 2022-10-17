@@ -1,7 +1,6 @@
 package database
 
 import (
-	"final_zoom/domain"
 	"fmt"
 	"log"
 	"os"
@@ -30,10 +29,10 @@ func InitDatabase() (*gorm.DB, error) {
 
 	// db.Debug().Migrator().DropTable(domain.User{}, domain.SocialMedia{}, domain.Photo{}, domain.Comment{})
 
-	db.Debug().AutoMigrate(domain.User{})
-	db.Debug().AutoMigrate(domain.SocialMedia{})
-	db.Debug().AutoMigrate(domain.Photo{})
-	db.Debug().AutoMigrate(domain.Comment{})
+	// db.Debug().AutoMigrate(domain.User{})
+	// db.Debug().AutoMigrate(domain.SocialMedia{})
+	// db.Debug().AutoMigrate(domain.Photo{})
+	// db.Debug().AutoMigrate(domain.Comment{})
 
 	return db, err
 }

@@ -2,24 +2,29 @@ package http
 
 import (
 	"final_zoom/domain"
+	"final_zoom/middlewares"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type PhotoHandler struct {
 	photoUseCase domain.PhotoUseCase
 }
 
-func NewPhotoHandler(r *gin.Engine, photoUc domain.PhotoUseCase) {
+func NewPhotoHandler(r *gin.Engine, photoUc domain.PhotoUseCase, db *gorm.DB) {
 	handler := &PhotoHandler{
 		photoUseCase: photoUc,
 	}
 	router := r.Group("/photos")
-	router.POST("/", handler.CreatePhoto)
-	router.GET("/", handler.GetPhotos)
-	router.PUT("/:photoId", handler.UpdatePhoto)
-	router.DELETE("/:photoId", handler.DeletePhoto)
+	{
+		router.Use(middlewares.Authentication())
+		router.POST("/", handler.CreatePhoto)
+		router.GET("/", handler.GetPhotos)
+		router.PUT("/:photoId", middlewares.PhotoAuthorization(db), handler.UpdatePhoto)
+		router.DELETE("/:photoId", middlewares.PhotoAuthorization(db), handler.DeletePhoto)
+	}
 }
 
 func (h PhotoHandler) CreatePhoto(c *gin.Context) {
@@ -61,9 +66,26 @@ func (h PhotoHandler) GetPhotos(c *gin.Context) {
 		return
 	}
 
+	hasil := make([]map[string]interface{}, len(res))
+	for i := 0; i < len(res); i++ {
+		hasil[i] = map[string]interface{}{
+			"id":         res[i]["id_photo"],
+			"title":      res[i]["title"],
+			"caption":    res[i]["caption"],
+			"photo_url":  res[i]["photo_url"],
+			"user_id":    res[i]["user_id"],
+			"created_at": res[i]["created_at"],
+			"updated_at": res[i]["updated_at"],
+			"User": map[string]interface{}{
+				"email":    res[i]["email"],
+				"username": res[i]["username"],
+			},
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"result": res,
 		"count":  len(res),
+		"photos": hasil,
 	})
 }
 

@@ -20,7 +20,7 @@ func (c sosmedUseCase) CreateSosmedUC(ctx *gin.Context) (sosmed *domain.SocialMe
 	return c.sosmedRepo.CreateSosmedRepository(ctx)
 }
 
-func (c sosmedUseCase) GetSosmedsUC(ctx *gin.Context) (sosmeds []*domain.SocialMedia, err error) {
+func (c sosmedUseCase) GetSosmedsUC(ctx *gin.Context) (results []map[string]interface{}, err error) {
 	return c.sosmedRepo.GetSosmedsRepository(ctx)
 }
 
