@@ -63,6 +63,7 @@ func (m *userRepository) UserLoginRepository(c *gin.Context) (token string, err 
 
 func (m *userRepository) GetUserByIdRepository(c *gin.Context) (user *domain.User, err error) {
 	id := c.Param("userId")
+	err = m.DB.Preload("SocialMedia").Preload("Photo").Preload("Comment").Where("id=?", id).Find(&user).Error
 	err = m.DB.Model(&user).Where("id=?", id).First(&user).Error
 	if err != nil {
 		return nil, err
@@ -72,7 +73,8 @@ func (m *userRepository) GetUserByIdRepository(c *gin.Context) (user *domain.Use
 }
 
 func (m *userRepository) GetUsersRepository(c *gin.Context) (users []*domain.User, err error) {
-	err = m.DB.Model(&users).Find(&users).Error
+	err = m.DB.Preload("SocialMedia").Preload("Photo").Preload("Comment").Find(&users).Error
+	// err = m.DB.Model(&users).Find(&users).Error
 	if err != nil {
 		return nil, err
 	}

@@ -34,14 +34,14 @@ func (c *Comment) BeforeUpdate(tx *gorm.DB) (err error) {
 
 type CommentUseCase interface {
 	CreateCommentUC(ctx *gin.Context) (*Comment, error)
-	GetCommentsUC(ctx *gin.Context) ([]map[string]interface{}, error)
+	GetCommentsUC(ctx *gin.Context) (*User, error)
 	UpdateCommentUC(ctx *gin.Context) (*Comment, error)
 	DeleteCommentUC(ctx *gin.Context) (*Comment, error)
 }
 
 type CommentRepository interface {
 	CreateCommentRepository(ctx *gin.Context) (*Comment, error)
-	GetCommentsRepository(ctx *gin.Context) ([]map[string]interface{}, error)
+	GetCommentsRepository(ctx *gin.Context) (*User, error)
 	UpdateCommentRepository(ctx *gin.Context) (*Comment, error)
 	DeleteCommentRepository(ctx *gin.Context) (*Comment, error)
 }

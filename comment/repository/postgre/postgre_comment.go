@@ -4,7 +4,6 @@ import (
 	"errors"
 	"final_zoom/domain"
 	"final_zoom/helpers"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -42,24 +41,16 @@ func (m *commentRepository) CreateCommentRepository(c *gin.Context) (comment *do
 	}
 	return comment, nil
 }
-func (m *commentRepository) GetCommentsRepository(c *gin.Context) (results []map[string]interface{}, err error) {
+func (m *commentRepository) GetCommentsRepository(c *gin.Context) (user *domain.User, err error) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	userID := uint(userData["id"].(float64))
-	query := fmt.Sprintf(`
-	SELECT c.id AS id_comment,c.message,c.user_id AS c_user_id,c.photo_id AS c_photo_id,c.created_at,c.updated_at,
-	u.id AS id_user,u.username,u.email,
-	p.id AS id_photo,p.title,p.caption,p.photo_url,p.user_id AS p_user_id
-	FROM comments c
-	LEFT JOIN users u on c.user_id = u.id
-	LEFT Join photos p on p.user_id = u.id WHERE u.id = %d`, userID)
-
-	err = m.DB.Debug().Raw(query).Scan(&results).Error
+	err = m.DB.Preload("Photo").Preload("Comment").Where("id=?", userID).Find(&user).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return results, nil
+	return user, nil
 }
 func (m *commentRepository) UpdateCommentRepository(c *gin.Context) (comment *domain.Comment, err error) {
 	var newComment domain.Comment

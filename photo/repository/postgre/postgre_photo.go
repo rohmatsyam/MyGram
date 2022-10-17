@@ -4,7 +4,6 @@ import (
 	"errors"
 	"final_zoom/domain"
 	"final_zoom/helpers"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -44,22 +43,16 @@ func (m *photoRepository) CreatePhotoRepository(c *gin.Context) (photo *domain.P
 	return photo, nil
 }
 
-func (m *photoRepository) GetPhotosRepository(c *gin.Context) (results []map[string]interface{}, err error) {
+func (m *photoRepository) GetPhotosRepository(c *gin.Context) (user *domain.User, err error) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	userID := uint(userData["id"].(float64))
-
-	query := fmt.Sprintf(`
-	SELECT p.id AS id_photo,p.title,p.caption,p.photo_url,p.user_id,p.created_at,p.updated_at,
-	u.email,u.username
-	FROM photos p
-	lEft JOIN users u ON p.user_id = u.id WHERE u.id=%d`, userID)
-	err = m.DB.Debug().Raw(query).Scan(&results).Error
+	err = m.DB.Preload("Photo").Where("id=?", userID).Find(&user).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return results, nil
+	return user, nil
 }
 
 func (m *photoRepository) UpdatePhotoRepository(c *gin.Context) (photo *domain.Photo, err error) {

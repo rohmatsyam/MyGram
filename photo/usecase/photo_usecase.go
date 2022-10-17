@@ -20,7 +20,7 @@ func (c photoUseCase) CreatePhotoUC(ctx *gin.Context) (photo *domain.Photo, err 
 	return c.photoRepo.CreatePhotoRepository(ctx)
 }
 
-func (c photoUseCase) GetPhotosUC(ctx *gin.Context) (results []map[string]interface{}, err error) {
+func (c photoUseCase) GetPhotosUC(ctx *gin.Context) (user *domain.User, err error) {
 	return c.photoRepo.GetPhotosRepository(ctx)
 }
 

@@ -48,7 +48,6 @@ func (h CommentHandler) CreateComment(c *gin.Context) {
 
 func (h CommentHandler) GetComments(c *gin.Context) {
 	res, err := h.commentUseCase.GetCommentsUC(c)
-
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"result": err.Error(),
@@ -57,41 +56,33 @@ func (h CommentHandler) GetComments(c *gin.Context) {
 		return
 	}
 
-	if len(res) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Data masih kosong",
-			"count":   0,
-		})
-		return
-	}
-
-	hasil := make([]map[string]interface{}, len(res))
-	for i := 0; i < len(res); i++ {
+	hasil := make([]map[string]interface{}, len(res.Comment))
+	for i := 0; i < len(res.Comment); i++ {
 		hasil[i] = map[string]interface{}{
-			"id":         res[i]["id_comment"],
-			"message":    res[i]["message"],
-			"photo_id":   res[i]["c_photo_id"],
-			"user_id":    res[i]["c_user_id"],
-			"created_at": res[i]["created_at"],
-			"updated_at": res[i]["updated_at"],
+			"id":         res.Comment[i].ID,
+			"message":    res.Comment[i].Message,
+			"photo_id":   res.Comment[i].PhotoID,
+			"user_id":    res.Comment[i].UserID,
+			"created_at": res.Comment[i].CreatedAt,
+			"updated_at": res.Comment[i].UpdatedAt,
 			"User": map[string]interface{}{
-				"id":       res[i]["id_user"],
-				"email":    res[i]["email"],
-				"username": res[i]["username"],
+				"id":       res.ID,
+				"email":    res.Email,
+				"username": res.Username,
 			},
 			"Photo": map[string]interface{}{
-				"id":        res[i]["id_photo"],
-				"title":     res[i]["title"],
-				"caption":   res[i]["caption"],
-				"photo_url": res[i]["photo_url"],
-				"user_id":   res[i]["p_user_id"],
+				"id":        res.Photo[i].ID,
+				"title":     res.Photo[i].Title,
+				"caption":   res.Photo[i].Caption,
+				"photo_url": res.Photo[i].PhotoURL,
+				"user_id":   res.Photo[i].UserID,
 			},
 		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
+		"count":  len(hasil),
 		"result": hasil,
-		"count":  len(res),
 	})
 }
 

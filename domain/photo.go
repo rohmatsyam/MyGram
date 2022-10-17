@@ -36,14 +36,14 @@ func (p *Photo) BeforeUpdate(tx *gorm.DB) (err error) {
 
 type PhotoUseCase interface {
 	CreatePhotoUC(ctx *gin.Context) (*Photo, error)
-	GetPhotosUC(ctx *gin.Context) ([]map[string]interface{}, error)
+	GetPhotosUC(ctx *gin.Context) (*User, error)
 	UpdatePhotoUC(ctx *gin.Context) (*Photo, error)
 	DeletePhotoUC(ctx *gin.Context) (*Photo, error)
 }
 
 type PhotoRepository interface {
 	CreatePhotoRepository(ctx *gin.Context) (*Photo, error)
-	GetPhotosRepository(ctx *gin.Context) ([]map[string]interface{}, error)
+	GetPhotosRepository(ctx *gin.Context) (*User, error)
 	UpdatePhotoRepository(ctx *gin.Context) (*Photo, error)
 	DeletePhotoRepository(ctx *gin.Context) (*Photo, error)
 }

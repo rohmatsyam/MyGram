@@ -4,7 +4,6 @@ import (
 	"errors"
 	"final_zoom/domain"
 	"final_zoom/helpers"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -44,19 +43,14 @@ func (m *sosmedRepository) CreateSosmedRepository(c *gin.Context) (sosmed *domai
 
 }
 
-func (m *sosmedRepository) GetSosmedsRepository(c *gin.Context) (results []map[string]interface{}, err error) {
+func (m *sosmedRepository) GetSosmedsRepository(c *gin.Context) (user *domain.User, err error) {
 	userData := c.MustGet("userData").(jwt.MapClaims)
 	userID := uint(userData["id"].(float64))
-	query := fmt.Sprintf(`
-	SELECT s.id AS id_sosmed,s.name,s.social_media_url,s.user_id,s.created_at,s.updated_at,
-	u.id AS id_user,u.username,u.email
-	FROM social_media s
-	LEFT JOIN users u on s.user_id = u.id WHERE u.id=%d`, userID)
-	err = m.DB.Debug().Raw(query).Scan(&results).Error
+	err = m.DB.Preload("SocialMedia").Where("id=?", userID).Find(&user).Error
 	if err != nil {
 		return nil, err
 	}
-	return results, nil
+	return user, nil
 }
 
 func (m *sosmedRepository) UpdateSosmedRepository(c *gin.Context) (sosmed *domain.SocialMedia, err error) {

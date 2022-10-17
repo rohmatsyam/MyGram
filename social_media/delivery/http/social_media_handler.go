@@ -56,34 +56,25 @@ func (h SosmedHandler) GetSosmeds(c *gin.Context) {
 		return
 	}
 
-	if len(res) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Data masih kosong",
-			"count":   0,
-		})
-		return
-	}
-
-	hasil := make([]map[string]interface{}, len(res))
-	for i := 0; i < len(res); i++ {
+	hasil := make([]map[string]interface{}, len(res.SocialMedia))
+	for i := 0; i < len(res.SocialMedia); i++ {
 		hasil[i] = map[string]interface{}{
-			"id":         res[i]["id_sosmed"],
-			"title":      res[i]["name"],
-			"caption":    res[i]["social_media_url"],
-			"user_id":    res[i]["user_id"],
-			"created_at": res[i]["created_at"],
-			"updated_at": res[i]["updated_at"],
+			"id":               res.SocialMedia[i].ID,
+			"name":             res.SocialMedia[i].Name,
+			"social_media_url": res.SocialMedia[i].SocialMediaURL,
+			"created_at":       res.SocialMedia[i].CreatedAt,
+			"updated_at":       res.SocialMedia[i].UpdatedAt,
 			"User": map[string]interface{}{
-				"id":       res[i]["id_user"],
-				"email":    res[i]["email"],
-				"username": res[i]["username"],
+				"id":       res.ID,
+				"email":    res.Email,
+				"username": res.Username,
 			},
 		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
+		"count":  len(hasil),
 		"result": hasil,
-		"count":  len(res),
 	})
 }
 

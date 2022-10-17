@@ -20,7 +20,7 @@ func (c commentUseCase) CreateCommentUC(ctx *gin.Context) (comment *domain.Comme
 	return c.commentRepo.CreateCommentRepository(ctx)
 }
 
-func (c commentUseCase) GetCommentsUC(ctx *gin.Context) (results []map[string]interface{}, err error) {
+func (c commentUseCase) GetCommentsUC(ctx *gin.Context) (user *domain.User, err error) {
 	return c.commentRepo.GetCommentsRepository(ctx)
 }
 

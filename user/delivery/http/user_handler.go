@@ -38,13 +38,11 @@ func (h UserHandler) GetUserById(c *gin.Context) {
 		}
 		c.JSON(http.StatusNotFound, result)
 		return
-	} else {
-		result = gin.H{
-			"result": res,
-			"count":  1,
-		}
 	}
-	c.JSON(http.StatusFound, result)
+	c.JSON(http.StatusFound, gin.H{
+		"count":  1,
+		"result": res,
+	})
 }
 
 func (h UserHandler) GetUsers(c *gin.Context) {
@@ -58,17 +56,9 @@ func (h UserHandler) GetUsers(c *gin.Context) {
 		return
 	}
 
-	if len(res) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Data masih kosong",
-			"count":   0,
-		})
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"result": res,
 		"count":  len(res),
+		"result": res,
 	})
 }
 

@@ -14,14 +14,14 @@ type SocialMedia struct {
 
 type SosmedUseCase interface {
 	CreateSosmedUC(ctx *gin.Context) (*SocialMedia, error)
-	GetSosmedsUC(ctx *gin.Context) ([]map[string]interface{}, error)
+	GetSosmedsUC(ctx *gin.Context) (*User, error)
 	UpdateSosmedUC(ctx *gin.Context) (*SocialMedia, error)
 	DeleteSosmedUC(ctx *gin.Context) (*SocialMedia, error)
 }
 
 type SosmedRepository interface {
 	CreateSosmedRepository(ctx *gin.Context) (*SocialMedia, error)
-	GetSosmedsRepository(ctx *gin.Context) ([]map[string]interface{}, error)
+	GetSosmedsRepository(ctx *gin.Context) (*User, error)
 	UpdateSosmedRepository(ctx *gin.Context) (*SocialMedia, error)
 	DeleteSosmedRepository(ctx *gin.Context) (*SocialMedia, error)
 }
