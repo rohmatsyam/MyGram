@@ -2,6 +2,7 @@ package domain
 
 import (
 	"final_zoom/helpers"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
@@ -9,14 +10,16 @@ import (
 )
 
 type User struct {
-	gorm.Model
+	ID          uint          `json:"id" gorm:"primarykey"`
 	Username    string        `json:"username" gorm:"NOT NULL;unique;type:varchar(255);" valid:"required"`
 	Email       string        `json:"email" gorm:"NOT NULL;unique;type:varchar(255);" valid:"required,email"`
-	Password    string        `json:"password" gorm:"NOT NULL;type:text;" valid:"required,minstringlength(6)"`
+	Password    string        `json:"password,omitempty" gorm:"NOT NULL;type:text;" valid:"required,minstringlength(6)"`
 	Age         uint          `json:"age" gorm:"NOT NULL;type:integer;" valid:"required,range(8|100)"`
 	SocialMedia []SocialMedia `json:"social_media,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Photo       []Photo       `json:"photos,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Comment     []Comment     `json:"comments,omitempty" gorm:"foreignKey:user_id;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

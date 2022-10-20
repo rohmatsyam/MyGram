@@ -81,6 +81,7 @@ func (h PhotoHandler) GetPhotos(c *gin.Context) {
 }
 
 func (h PhotoHandler) UpdatePhoto(c *gin.Context) {
+	// KURANG ID
 	res, err := h.photoUseCase.UpdatePhotoUC(c)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -99,6 +100,7 @@ func (h PhotoHandler) UpdatePhoto(c *gin.Context) {
 }
 
 func (h PhotoHandler) DeletePhoto(c *gin.Context) {
+	// KURANG ID
 	_, err := h.photoUseCase.DeletePhotoUC(c)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{

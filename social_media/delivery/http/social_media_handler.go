@@ -96,6 +96,7 @@ func (h SosmedHandler) UpdateSosmed(c *gin.Context) {
 }
 
 func (h SosmedHandler) DeleteSosmed(c *gin.Context) {
+	// KURANG ID
 	_, err := h.sosmedUseCase.DeleteSosmedUC(c)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{

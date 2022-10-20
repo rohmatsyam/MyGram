@@ -1,16 +1,20 @@
 package domain
 
 import (
+	"time"
+
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type Comment struct {
-	gorm.Model
-	Message string `json:"message" gorm:"NOT NULL;type:text;" valid:"required"`
-	UserID  uint   `json:"user_id"`
-	PhotoID uint   `json:"photo_id"`
+	ID        uint      `json:"id" gorm:"primarykey"`
+	Message   string    `json:"message" gorm:"NOT NULL;type:text;" valid:"required"`
+	UserID    uint      `json:"user_id"`
+	PhotoID   uint      `json:"photo_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (c *Comment) BeforeCreate(tx *gorm.DB) (err error) {

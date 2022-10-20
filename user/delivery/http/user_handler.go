@@ -33,12 +33,28 @@ func (h UserHandler) GetUserById(c *gin.Context) {
 	res, err := h.userUseCase.GetUserByIdUc(c)
 	if err != nil {
 		result = gin.H{
-			"result": err.Error(),
 			"count":  0,
+			"result": err.Error(),
 		}
 		c.JSON(http.StatusNotFound, result)
 		return
 	}
+	// hasil := make([]map[string]interface{}, len(res.SocialMedia))
+	// for i := 0; i < len(res.SocialMedia); i++ {
+	// 	hasil[i] = map[string]interface{}{
+	// 		"id":               res.SocialMedia[i].ID,
+	// 		"name":             res.SocialMedia[i].Name,
+	// 		"social_media_url": res.SocialMedia[i].SocialMediaURL,
+	// 		"created_at":       res.SocialMedia[i].CreatedAt,
+	// 		"updated_at":       res.SocialMedia[i].UpdatedAt,
+	// 		"User": map[string]interface{}{
+	// 			"id":       res.ID,
+	// 			"email":    res.Email,
+	// 			"username": res.Username,
+	// 		},
+	// 	}
+	// }
+	res.Password = ""
 	c.JSON(http.StatusFound, gin.H{
 		"count":  1,
 		"result": res,

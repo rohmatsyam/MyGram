@@ -2,13 +2,23 @@ package helpers
 
 import (
 	"errors"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/joho/godotenv"
 )
 
-var secretKey = "rahasia"
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
+
+var secretKey = os.Getenv("SECRET_KEY")
 
 func GenerateToken(id uint, email string) string {
 	// menyimpan data user

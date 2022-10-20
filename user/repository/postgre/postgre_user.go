@@ -63,8 +63,14 @@ func (m *userRepository) UserLoginRepository(c *gin.Context) (token string, err 
 
 func (m *userRepository) GetUserByIdRepository(c *gin.Context) (user *domain.User, err error) {
 	id := c.Param("userId")
+	err = helpers.CheckParamIsNumber(id)
+	if err != nil {
+
+		return nil, errors.New("invalid param")
+	}
+
 	err = m.DB.Preload("SocialMedia").Preload("Photo").Preload("Comment").Where("id=?", id).Find(&user).Error
-	err = m.DB.Model(&user).Where("id=?", id).First(&user).Error
+	// err = m.DB.Model(&user).Where("id=?", id).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +90,7 @@ func (m *userRepository) GetUsersRepository(c *gin.Context) (users []*domain.Use
 func (m *userRepository) UpdateUserRepository(c *gin.Context) (user *domain.User, err error) {
 	var newUser domain.User
 	id := c.Param("userId")
+
 	contentType := helpers.GetContentType(c)
 	if contentType == appJSON {
 		c.ShouldBindJSON(&newUser)
